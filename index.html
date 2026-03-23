@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>18 Jahre Flachwitz-Generator</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      color: #222;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 720px;
+      background: rgba(255, 255, 255, 0.92);
+      border-radius: 24px;
+      padding: 32px 24px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+      text-align: center;
+    }
+
+    .badge {
+      display: inline-block;
+      background: #222;
+      color: white;
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-size: 0.9rem;
+      margin-bottom: 18px;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      line-height: 1.1;
+    }
+
+    .subtitle {
+      margin: 0 auto 28px;
+      max-width: 520px;
+      color: #555;
+      font-size: 1.05rem;
+      line-height: 1.5;
+    }
+
+    .joke-box {
+      background: #fff7ef;
+      border: 2px solid #ffd2a8;
+      border-radius: 20px;
+      padding: 28px 20px;
+      min-height: 150px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 24px;
+    }
+
+    #joke {
+      font-size: clamp(1.2rem, 3vw, 1.7rem);
+      line-height: 1.5;
+      margin: 0;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+
+    button {
+      border: none;
+      border-radius: 14px;
+      padding: 14px 20px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.15s ease, opacity 0.15s ease;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      opacity: 0.95;
+    }
+
+    .primary {
+      background: #222;
+      color: white;
+    }
+
+    .secondary {
+      background: #ffe4c8;
+      color: #222;
+    }
+
+    .footer-info {
+      color: #666;
+      font-size: 0.95rem;
+      margin-top: 8px;
+    }
+
+    .small-note {
+      margin-top: 16px;
+      color: #888;
+      font-size: 0.85rem;
+    }
+
+    @media (max-width: 520px) {
+      .card {
+        padding: 24px 16px;
+      }
+
+      .joke-box {
+        padding: 22px 16px;
+      }
+
+      button {
+        width: 100%;
+      }
+
+      .buttons {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="badge">🎉 Level 18 erreicht</div>
+    <h1>Der Flachwitz-Generator</h1>
+    <p class="subtitle">
+      Zum 18. Geburtstag gibt es keine tiefgründigen Weisheiten, sondern
+      genau das, was die Welt wirklich braucht: schlechte Witze.
+    </p>
+
+    <div class="joke-box">
+      <p id="joke">Drück auf den Button und starte offiziell ins Dad-Joke-Zeitalter.</p>
+    </div>
+
+    <div class="buttons">
+      <button class="primary" onclick="newJoke()">🎲 Neuer Witz</button>
+      <button class="secondary" onclick="copyJoke()">📋 Witz kopieren</button>
+    </div>
+
+    <div class="footer-info">
+      Bereits gelesen: <span id="counter">0</span> Witze
+    </div>
+
+    <div class="small-note">
+      Je schlechter der Witz, desto besser das Geschenk.
+    </div>
+  </div>
+
+  <script>
+    const jokes = [
+      "Was macht ein Pirat am Computer? Er drückt die Enter-Taste.",
+      "Wie nennt man einen Bumerang, der nicht zurückkommt? Stock.",
+      "Was ist orange und läuft durch den Wald? Eine Wanderine.",
+      "Warum können Geister so schlecht lügen? Weil man durch sie hindurchsieht.",
+      "Wie heißt ein Keks unter einem Baum? Ein schattiges Plätzchen.",
+      "Was macht ein Clown im Büro? Faxen.",
+      "Treffen sich zwei Jäger. Beide tot.",
+      "Warum trinken Mäuse keinen Alkohol? Weil sie Angst vor dem Kater haben.",
+      "Wie nennt man ein helles Mammut? Helmut.",
+      "Was ist grün und sitzt auf dem Klo? Ein Kacktus.",
+      "Was liegt am Strand und spricht undeutlich? Eine Nuschel.",
+      "Warum haben Elefanten graue Falten? Weil Bügeln zu aufwendig ist.",
+      "Wie nennt man einen sehr schnellen Vogel? Turbospecht.",
+      "Warum können Seeräuber keinen Kreis fahren? Weil sie Pi raten.",
+      "Was macht ein Mathematiker im Garten? Wurzeln ziehen.",
+      "Was ist weiß und stört beim Frühstück? Eine Lawine.",
+      "Was macht eine Wolke, wenn sie juckt? Donnern.",
+      "Was sagt der große Stift zum kleinen Stift? Wachs-mal-Stift.",
+      "Wie nennt man einen Hund ohne Beine? Ist egal, er kommt eh nicht.",
+      "Warum gehen Uhren nie in Rente? Sie ticken einfach weiter.",
+      "Was ist gelb und kann nicht schwimmen? Ein Bagger. Warum? Er hat nur einen Arm.",
+      "Warum können Skelette so schlecht lügen? Weil sie nichts zu verbergen haben.",
+      "Was ist braun, klebrig und läuft durch den Wald? Ein Stock mit Karamell... okay, nur ein Stock.",
+      "Wie nennt man einen vollen Aufzug? Besetzt.",
+      "Was macht ein Hai auf dem Fußballfeld? Er grätscht nicht, er haitscht.",
+      "Was ist das Lieblingsgetränk von Informatikern? Java.",
+      "Warum können Fische nicht telefonieren? Weil sie im Netz hängen.",
+      "Wie nennt man ein pessimistisch angezogenes Auto? Einen Schwarzfahrer.",
+      "Was ist unsichtbar und riecht nach Karotten? Kaninchenpups.",
+      "Was macht ein Schneemann im Sommer? Er chillt nicht lange.",
+      "Warum wurde der Pilz auf die Party eingeladen? Weil er ein Champignon war.",
+      "Was macht ein Brot in der Sonne? Es toastet.",
+      "Wie nennt man einen Bären, der schreit? Brüllbär.",
+      "Was macht ein Stromer im Garten? Er entlädt sich.",
+      "Was sagt ein Fisch, wenn er gegen die Wand schwimmt? Damm.",
+      "Warum sind Friedhöfe so beliebt? Da liegen viele Leute.",
+      "Was macht ein Cowboy ohne Pferd? Er geht zu Fußboy.",
+      "Wie nennt man einen nervösen Igel? Einen Stichling.",
+      "Was ist klein, rot und klopft an die Scheibe? Ein Baby im Backofen. Okay, der ist zu alt, aber genau darum geht’s.",
+      "Warum sind Dad Jokes nie wirklich schlecht? Weil sie immer ziehen. Nur halt nicht bei jedem.",
+      "Was macht eine Ente auf dem Laptop? Sie surft im Quak-Modus.",
+      "Wie heißt ein Spanier ohne Auto? Carlos.",
+      "Wie nennt man einen Beamten mit Bauch? Kugelschreiber.",
+      "Was macht ein Vampir im Büro? Er zählt Überstunden.",
+      "Warum ist der Kalender so beliebt? Weil er viele Dates hat.",
+      "Was macht ein Handy ohne Empfang? Funkstille.",
+      "Wie nennt man einen fehlerfreien Kugelschreiber? Un-glaub-lich.",
+      "Was macht ein Paket beim Yoga? Es entspannt die Lage.",
+      "Warum sind Bienen so gut in Mathe? Weil sie immer im Sechseck rechnen.",
+      "Was ist die härteste Sprache der Welt? Deutsch. Da ist sogar der Artikel schwer.",
+      "Wie nennt man einen stolzen Stromkreis? Überzeugt.",
+      "Was sagt der Null zum Acht? Schicker Gürtel.",
+      "Warum nehmen Kühe keine Drogen? Weil sie Angst vor dem Muhtrip haben.",
+      "Was ist ein Keks unter einem Blätterhaufen? Ein Herbstgebäck.",
+      "Wie nennt man einen kleinen Türsteher? Sicherheitshalber.",
+      "Was ist grau und kann nicht fliegen? Ein Parkplatz.",
+      "Warum war der Fernseher beleidigt? Weil er angemacht wurde.",
+      "Was macht ein DJ im Baumarkt? Er droppt den Hammer.",
+      "Wie nennt man einen Zauberer, der im Urlaub ist? Weg hex.",
+      "Warum können Bücher nicht schwimmen? Weil sie untergehen würden.",
+      "Was macht ein Apfel auf der Straße? Er rollt ab.",
+      "Wie nennt man eine Gruppe müder Wölfe? Schlafrudel."
+    ];
+
+    let count = 0;
+    let lastIndex = -1;
+
+    function newJoke() {
+      let randomIndex;
+
+      do {
+        randomIndex = Math.floor(Math.random() * jokes.length);
+      } while (randomIndex === lastIndex && jokes.length > 1);
+
+      lastIndex = randomIndex;
+      document.getElementById("joke").textContent = jokes[randomIndex];
+
+      count++;
+      document.getElementById("counter").textContent = count;
+    }
+
+    async function copyJoke() {
+      const jokeText = document.getElementById("joke").textContent;
+
+      try {
+        await navigator.clipboard.writeText(jokeText);
+        alert("Witz kopiert 😎");
+      } catch (error) {
+        alert("Kopieren hat leider nicht geklappt.");
+      }
+    }
+  </script>
+</body>
+</html>
