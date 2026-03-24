@@ -1,532 +1,99 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Jorn-Witz-Generator</title>
-  <style>
-    * {
-      box-sizing: border-box;
-    }
+<meta charset="UTF-8">
+<title>Dad Joke Generator</title>
 
-    body {
-      margin: 0;
-      min-height: 100vh;
-      font-family: Arial, Helvetica, sans-serif;
-      background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
-      color: #222;
-      overflow-x: hidden;
-    }
+<style>
+body {
+  font-family: Arial;
+  background: linear-gradient(135deg,#f6d365,#fda085);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  height:100vh;
+  margin:0;
+}
 
-    .card {
-      width: 100%;
-      max-width: 760px;
-      background: rgba(255, 255, 255, 0.94);
-      border-radius: 24px;
-      padding: 32px 24px;
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
-      text-align: center;
-      position: relative;
-      z-index: 2;
-    }
+.card {
+  background:white;
+  padding:30px;
+  border-radius:20px;
+  text-align:center;
+  max-width:600px;
+}
 
-    .badge {
-      display: inline-block;
-      background: #222;
-      color: white;
-      padding: 8px 14px;
-      border-radius: 999px;
-      font-size: 0.9rem;
-      margin-bottom: 18px;
-    }
+button {
+  padding:12px 20px;
+  border:none;
+  border-radius:10px;
+  margin-top:15px;
+  cursor:pointer;
+}
 
-    h1 {
-      margin: 0 0 10px;
-      font-size: clamp(2rem, 5vw, 3.2rem);
-      line-height: 1.1;
-    }
+.primary { background:black; color:white; }
+.secondary { background:#eee; }
 
-    .subtitle {
-      margin: 0 auto 28px;
-      max-width: 560px;
-      color: #555;
-      font-size: 1.05rem;
-      line-height: 1.5;
-    }
+#answer { display:none; margin-top:10px; }
 
-    .joke-box {
-      background: #fff7ef;
-      border: 2px solid #ffd2a8;
-      border-radius: 20px;
-      padding: 28px 20px;
-      min-height: 190px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 24px;
-      gap: 18px;
-    }
+.confetti {
+  position:fixed;
+  width:8px;
+  height:12px;
+  top:-20px;
+  animation:fall 3s linear forwards;
+}
 
-    .joke-main {
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      align-items: center;
-    }
-
-    #jokeQuestion,
-    #jokeSingle {
-      font-size: clamp(1.2rem, 3vw, 1.7rem);
-      line-height: 1.5;
-      margin: 0;
-      font-weight: 700;
-    }
-
-    #jokeAnswer {
-      font-size: clamp(1.05rem, 2.5vw, 1.35rem);
-      line-height: 1.5;
-      margin: 0;
-      color: #5c3d1e;
-      background: #ffe8cf;
-      padding: 14px 16px;
-      border-radius: 16px;
-      max-width: 90%;
-      display: none;
-      animation: fadeInUp 0.35s ease;
-    }
-
-    .buttons {
-      display: flex;
-      gap: 12px;
-      justify-content: center;
-      flex-wrap: wrap;
-      margin-bottom: 18px;
-    }
-
-    button {
-      border: none;
-      border-radius: 14px;
-      padding: 14px 20px;
-      font-size: 1rem;
-      font-weight: bold;
-      cursor: pointer;
-      transition: transform 0.15s ease, opacity 0.15s ease, background 0.2s ease;
-    }
-
-    button:hover {
-      transform: translateY(-2px);
-      opacity: 0.95;
-    }
-
-    .primary {
-      background: #222;
-      color: white;
-    }
-
-    .secondary {
-      background: #ffe4c8;
-      color: #222;
-    }
-
-    .secondary:disabled {
-      opacity: 0.45;
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    .footer-info {
-      color: #666;
-      font-size: 0.95rem;
-      margin-top: 8px;
-    }
-
-    .small-note {
-      margin-top: 16px;
-      color: #888;
-      font-size: 0.85rem;
-    }
-
-    .confetti {
-      position: fixed;
-      width: 10px;
-      height: 16px;
-      top: -20px;
-      border-radius: 2px;
-      opacity: 0.95;
-      z-index: 9999;
-      animation: fall linear forwards;
-      pointer-events: none;
-    }
-
-    @keyframes fall {
-      0% {
-        transform: translateY(-20px) rotate(0deg);
-      }
-      100% {
-        transform: translateY(110vh) rotate(720deg);
-      }
-    }
-
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(8px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    @media (max-width: 520px) {
-      .card {
-        padding: 24px 16px;
-      }
-
-      .joke-box {
-        padding: 22px 16px;
-        min-height: 220px;
-      }
-
-      button {
-        width: 100%;
-      }
-
-      .buttons {
-        flex-direction: column;
-      }
-
-      #jokeAnswer {
-        max-width: 100%;
-      }
-    }
-  </style>
+@keyframes fall {
+  to { transform:translateY(100vh) rotate(720deg); }
+}
+</style>
 </head>
+
 <body>
-  <div class="card">
-    <div class="badge">🎉 Level 18 erreicht</div>
-    <h1>Der Jorn-Witz-Generator</h1>
-    <p class="subtitle">
-      Zum 18. Geburtstag gibt es keine tiefgründigen Weisheiten,
-      sondern genau das, was die Welt wirklich braucht:
-      schlechte Witze mit maximalem Jorn-Joke-Potenzial.
-    </p>
 
-    <div class="joke-box">
-      <div class="joke-main">
-        <p id="jokeSingle">Drück auf den Button und starte offiziell ins Dad-Joke-Zeitalter.</p>
-        <p id="jokeQuestion" style="display: none;"></p>
-        <p id="jokeAnswer"></p>
-      </div>
-      <button id="answerBtn" class="secondary" onclick="showAnswer()" disabled>
-        👀 Antwort zeigen
-      </button>
-    </div>
+<div class="card">
+  <h1>🎉 Dad Joke Generator 🎉</h1>
 
-    <div class="buttons">
-      <button class="primary" onclick="newJoke()">🎲 Neuer Witz</button>
-    </div>
+  <p id="question">Drück den Button 😎</p>
+  <p id="answer"></p>
 
-    <div class="footer-info">
-      Bereits gelesen: <span id="counter">0</span> Witze
-    </div>
+  <button class="primary" onclick="getJoke()">Neuer Witz</button>
+  <button class="secondary" onclick="showAnswer()">Antwort zeigen</button>
+</div>
 
-    <div class="small-note">
-      Je schlechter der Witz, desto besser das Geschenk.
-    </div>
-  </div>
+<script>
+let currentJoke = null;
 
-  <script>
-    const jokes = [
-      { type: "qa", question: "Was macht ein Pirat am Computer?", answer: "Er drückt die Enter-Taste." },
-      { type: "qa", question: "Wie nennt man einen Bumerang, der nicht zurückkommt?", answer: "Stock." },
-      { type: "qa", question: "Was ist orange und läuft durch den Wald?", answer: "Eine Wanderine." },
-      { type: "qa", question: "Warum können Geister so schlecht lügen?", answer: "Weil man durch sie hindurchsieht." },
-      { type: "qa", question: "Wie heißt ein Keks unter einem Baum?", answer: "Ein schattiges Plätzchen." },
-      { type: "qa", question: "Was macht ein Clown im Büro?", answer: "Faxen." },
-      { type: "single", text: "Treffen sich zwei Jäger. Beide tot." },
-      { type: "qa", question: "Warum trinken Mäuse keinen Alkohol?", answer: "Weil sie Angst vor dem Kater haben." },
-      { type: "qa", question: "Wie nennt man ein helles Mammut?", answer: "Helmut." },
-      { type: "qa", question: "Was ist grün und sitzt auf dem Klo?", answer: "Ein Kacktus." },
-      { type: "qa", question: "Was liegt am Strand und spricht undeutlich?", answer: "Eine Nuschel." },
-      { type: "qa", question: "Warum haben Elefanten graue Falten?", answer: "Weil Bügeln zu aufwendig ist." },
-      { type: "qa", question: "Wie nennt man einen sehr schnellen Vogel?", answer: "Turbospecht." },
-      { type: "qa", question: "Warum können Seeräuber keinen Kreis fahren?", answer: "Weil sie Pi raten." },
-      { type: "qa", question: "Was macht ein Mathematiker im Garten?", answer: "Wurzeln ziehen." },
-      { type: "qa", question: "Was ist weiß und stört beim Frühstück?", answer: "Eine Lawine." },
-      { type: "qa", question: "Was macht eine Wolke, wenn sie juckt?", answer: "Donnern." },
-      { type: "qa", question: "Was sagt der große Stift zum kleinen Stift?", answer: "Wachs-mal-Stift." },
-      { type: "qa", question: "Wie nennt man einen Hund ohne Beine?", answer: "Ist egal, er kommt eh nicht." },
-      { type: "qa", question: "Warum gehen Uhren nie in Rente?", answer: "Sie ticken einfach weiter." },
-      { type: "qa", question: "Was ist gelb und kann nicht schwimmen?", answer: "Ein Bagger. Warum? Er hat nur einen Arm." },
-      { type: "qa", question: "Warum können Skelette so schlecht lügen?", answer: "Weil sie nichts zu verbergen haben." },
-      { type: "qa", question: "Was ist unsichtbar und riecht nach Karotten?", answer: "Kaninchenpups." },
-      { type: "qa", question: "Warum wurde der Pilz auf die Party eingeladen?", answer: "Weil er ein Champignon war." },
-      { type: "qa", question: "Was macht ein Brot in der Sonne?", answer: "Es toastet." },
-      { type: "qa", question: "Wie nennt man einen Bären, der schreit?", answer: "Brüllbär." },
-      { type: "qa", question: "Was sagt ein Fisch, wenn er gegen die Wand schwimmt?", answer: "Damm." },
-      { type: "qa", question: "Warum sind Friedhöfe so beliebt?", answer: "Da liegen viele Leute." },
-      { type: "qa", question: "Was macht ein Cowboy ohne Pferd?", answer: "Er geht zu Fußboy." },
-      { type: "qa", question: "Wie heißt ein Spanier ohne Auto?", answer: "Carlos." },
-      { type: "qa", question: "Wie nennt man einen Beamten mit Bauch?", answer: "Kugelschreiber." },
-      { type: "qa", question: "Warum ist der Kalender so beliebt?", answer: "Weil er viele Dates hat." },
-      { type: "qa", question: "Was macht ein Handy ohne Empfang?", answer: "Funkstille." },
-      { type: "qa", question: "Warum sind Bienen so gut in Mathe?", answer: "Weil sie immer im Sechseck rechnen." },
-      { type: "qa", question: "Was sagt die Null zur Acht?", answer: "Schicker Gürtel." },
-      { type: "qa", question: "Warum nehmen Kühe keine Drogen?", answer: "Weil sie Angst vor dem Muhtrip haben." },
-      { type: "qa", question: "Was ist grau und kann nicht fliegen?", answer: "Ein Parkplatz." },
-      { type: "qa", question: "Warum war der Fernseher beleidigt?", answer: "Weil er angemacht wurde." },
-      { type: "qa", question: "Was macht ein DJ im Baumarkt?", answer: "Er droppt den Hammer." },
-      { type: "qa", question: "Wie nennt man einen Zauberer, der im Urlaub ist?", answer: "Weg hex." },
-      { type: "qa", question: "Warum können Bücher nicht schwimmen?", answer: "Weil sie untergehen würden." },
-      { type: "qa", question: "Was macht ein Apfel auf der Straße?", answer: "Er rollt ab." },
-      { type: "qa", question: "Wie nennt man eine Gruppe müder Wölfe?", answer: "Schlafrudel." },
-      { type: "qa", question: "Was macht ein Frosch auf der Autobahn?", answer: "Einen Hüpfer." },
-      { type: "qa", question: "Wie nennt man einen Keks, der im Aufzug stecken bleibt?", answer: "Einen Fahrstuhl-Keks." },
-      { type: "qa", question: "Was macht eine Zitrone auf dem Tennisplatz?", answer: "Sie schlägt zurück." },
-      { type: "qa", question: "Wie nennt man einen Bleistift, der zu spät kommt?", answer: "Verspitzt." },
-      { type: "qa", question: "Warum gehen Ameisen nicht in die Kirche?", answer: "Weil sie Insekten sind." },
-      { type: "qa", question: "Was trägt ein Haus bei Regen?", answer: "Den Dachschirm." },
-      { type: "qa", question: "Wie nennt man einen panischen Teebeutel?", answer: "Zieh-mlich nervös." },
-      { type: "qa", question: "Was macht eine Banane im Fitnessstudio?", answer: "Sie schält Muskeln auf." },
-      { type: "qa", question: "Wie nennt man ein freundliches Gewitter?", answer: "Sympathisch geladen." },
-      { type: "qa", question: "Was macht ein Würfel beim Arzt?", answer: "Er lässt sich durchchecken." },
-      { type: "qa", question: "Wie nennt man eine musikalische Schlange?", answer: "Eine Hiss-Hit-Maschine." },
-      { type: "qa", question: "Was macht ein Schuh im Internet?", answer: "Er surft auf Sohlen." },
-      { type: "qa", question: "Wie nennt man einen schlafenden Laptop?", answer: "Zu-geklappt." },
-      { type: "qa", question: "Warum mögen Kerzen keine Diskussionen?", answer: "Weil sie schnell ausbrennen." },
-      { type: "qa", question: "Was macht eine Tomate im Aufzug?", answer: "Sie fährt Ketchup." },
-      { type: "qa", question: "Wie nennt man einen traurigen Kaffee?", answer: "Depresso." },
-      { type: "qa", question: "Was macht ein Kalender beim Dating?", answer: "Er plant voraus." },
-      { type: "qa", question: "Wie nennt man einen schlecht gelaunten Bäcker?", answer: "Muffin." },
-      { type: "qa", question: "Was macht ein Pinguin in der Wüste?", answer: "Urlaub mit Anlaufschwierigkeiten." },
-      { type: "qa", question: "Wie nennt man einen wütenden Kuchen?", answer: "Aufgebracht." },
-      { type: "qa", question: "Was macht ein Stuhl auf Social Media?", answer: "Er postet Sitzungen." },
-      { type: "qa", question: "Wie nennt man ein sehr vorsichtiges Reh?", answer: "Sicherungsreh." },
-      { type: "qa", question: "Was macht ein Magnet im Club?", answer: "Er zieht alle an." },
-      { type: "qa", question: "Wie nennt man einen klugen Kaugummi?", answer: "Intelli-Kau." },
-      { type: "qa", question: "Was macht ein Fahrrad im Gefängnis?", answer: "Es sitzt ab." },
-      { type: "qa", question: "Wie nennt man einen gelangweilten Postboten?", answer: "Brieflich unterfordert." },
-      { type: "qa", question: "Was macht ein Fenster im Winter?", answer: "Es zieht sich zu." },
-      { type: "qa", question: "Wie nennt man einen höflichen Löwen?", answer: "Bitte-Löwe." },
-      { type: "qa", question: "Was macht ein Paket im Urlaub?", answer: "Es entspannt die Lage." },
-      { type: "qa", question: "Wie nennt man einen Hund im Fitnessstudio?", answer: "Muskelwau." },
-      { type: "qa", question: "Was macht ein Buch beim Friseur?", answer: "Es lässt die Seiten schneiden." },
-      { type: "qa", question: "Wie nennt man einen coolen Vulkan?", answer: "Lava lässig." },
-      { type: "qa", question: "Was macht ein Toast im Schwimmbad?", answer: "Es geht baden." },
-      { type: "qa", question: "Wie nennt man einen schüchternen Kuchen?", answer: "Verlegenheitsgebäck." },
-      { type: "qa", question: "Was macht eine Brille im Unterricht?", answer: "Sie passt auf." },
-      { type: "qa", question: "Wie nennt man einen ehrlichen Dieb?", answer: "Selten." },
-      { type: "qa", question: "Was macht ein Eimer im Kino?", answer: "Er sitzt in der ersten Reihe." },
-      { type: "qa", question: "Wie nennt man einen Bäcker auf Weltreise?", answer: "Globrotter." },
-      { type: "qa", question: "Was macht ein Kissen in der Schule?", answer: "Es verschläft fast alles." },
-      { type: "qa", question: "Wie nennt man einen hyperaktiven Tintenfisch?", answer: "Zappelkalmar." },
-      { type: "qa", question: "Was macht ein Stern auf dem Bauernhof?", answer: "Er strahlt mit dem Stall um die Wette." },
-      { type: "qa", question: "Wie nennt man eine Kuh mit Taschenlampe?", answer: "Muhdbeleuchtung." },
-      { type: "qa", question: "Was macht ein Besen im Urlaub?", answer: "Er kehrt mal ab." },
-      { type: "qa", question: "Wie nennt man einen entspannten Fisch?", answer: "Chill-Hering." },
-      { type: "qa", question: "Was macht eine Uhr am Strand?", answer: "Sie läuft ab." },
-      { type: "qa", question: "Wie nennt man eine schnelle Kartoffel?", answer: "Pommes in Eile." },
-      { type: "qa", question: "Was macht ein Hefeteig beim Dating?", answer: "Er geht auf." },
-      { type: "qa", question: "Wie nennt man ein nervöses Schaf?", answer: "Mähga angespannt." },
-      { type: "qa", question: "Was macht ein Lineal im Club?", answer: "Es misst die Stimmung." },
-      { type: "qa", question: "Wie nennt man einen traurigen Dinosaurier?", answer: "Weinoraptor." },
-      { type: "qa", question: "Was macht ein Akku im Restaurant?", answer: "Er lädt zum Essen ein." },
-      { type: "qa", question: "Wie nennt man eine schicke Orange?", answer: "Mandarin in Abendgarderobe." },
-      { type: "qa", question: "Was macht ein Kaktus beim Yoga?", answer: "Er bleibt spitz konzentriert." },
-      { type: "qa", question: "Wie nennt man einen höflichen Computer?", answer: "Bitte-PC." },
-      { type: "qa", question: "Was macht ein Sofa im Gym?", answer: "Es stemmt gemütlich nichts." },
-      { type: "qa", question: "Wie nennt man einen philosophischen Keks?", answer: "Sinngebäck." },
-      { type: "qa", question: "Was macht eine Socke im Museum?", answer: "Sie bestaunt alte Paare." },
-      { type: "qa", question: "Wie nennt man einen arroganten Kalender?", answer: "Date-überheblich." },
-      { type: "qa", question: "Was macht ein Käse beim Fototermin?", answer: "Er sagt Cheeeese." },
-      { type: "qa", question: "Wie nennt man einen sehr ordentlichen Hund?", answer: "Strukturwau." },
-      { type: "qa", question: "Was macht ein Donut in der Schule?", answer: "Er dreht sich im Kreis." },
-      { type: "qa", question: "Wie nennt man einen müden Zauberer?", answer: "Schlafrakadabra." },
-      { type: "qa", question: "Was macht ein Baum am Computer?", answer: "Er loggt sich ein." },
-      { type: "qa", question: "Wie nennt man einen schlecht gelaunten König?", answer: "Majestätisch genervt." },
-      { type: "qa", question: "Was macht eine Nudel bei Stress?", answer: "Sie kocht über." },
-      { type: "qa", question: "Wie nennt man ein unsicheres Ei?", answer: "Zweifelsfrei noch nicht entschieden." },
-      { type: "qa", question: "Was macht ein Bär im Café?", answer: "Er bestellt einen Bruccino." },
-      { type: "qa", question: "Wie nennt man eine mathematische Katze?", answer: "Pythagoratz." },
-      { type: "qa", question: "Was macht ein Auto im Schlafanzug?", answer: "Es fährt im Pyjama." },
-      { type: "qa", question: "Wie nennt man einen bequemen Vogel?", answer: "Sitzmeise." },
-      { type: "qa", question: "Was macht eine Giraffe im Aufzug?", answer: "Sich lang machen." },
-      { type: "qa", question: "Wie nennt man einen Chefkoch ohne Plan?", answer: "Ratlosotto." },
-      { type: "qa", question: "Was macht ein Schaf auf TikTok?", answer: "Es geht viral mit mähßigem Content." },
-      { type: "qa", question: "Wie nennt man einen müden Bleistift?", answer: "Abgespitzt." },
-      { type: "qa", question: "Was macht ein Hotdog im Winter?", answer: "Er friert sein Würstchen." },
-      { type: "qa", question: "Wie nennt man einen pünktlichen Fisch?", answer: "Terminhai." },
-      { type: "qa", question: "Was macht eine Lampe im Bewerbungsgespräch?", answer: "Sie bringt sich ins beste Licht." },
-      { type: "qa", question: "Wie nennt man einen lustigen Baum?", answer: "Scherzholz." },
-      { type: "qa", question: "Was macht eine Maus im Restaurant?", answer: "Sie knabbert an der Karte." },
-      { type: "qa", question: "Wie nennt man einen wandernden Stift?", answer: "Reiseblei." },
-      { type: "qa", question: "Was macht eine Kiwi im Schnee?", answer: "Sie sucht Fruchtwärme." },
-      { type: "qa", question: "Wie nennt man einen gechillten Polizisten?", answer: "Copacabana." },
-      { type: "qa", question: "Was macht ein Besen im Chor?", answer: "Er kehrt den Ton." },
-      { type: "qa", question: "Wie nennt man einen mutigen Löffel?", answer: "Tapferbesteck." },
-      { type: "qa", question: "Was macht ein Huhn beim Friseur?", answer: "Es lässt sich geschniegelt picken." },
-      { type: "qa", question: "Wie nennt man einen Bäcker mit WLAN?", answer: "Hotspot-Brötchengeber." },
-      { type: "qa", question: "Was macht ein Wal auf dem Spielplatz?", answer: "Er geht auf die Rutsche nur in Gedanken." },
-      { type: "qa", question: "Wie nennt man einen faulen Wecker?", answer: "Spätmelder." },
-      { type: "qa", question: "Was macht ein Handy auf Diät?", answer: "Es reduziert Daten." },
-      { type: "qa", question: "Wie nennt man eine höfliche Tomate?", answer: "Danke-schönate." },
-      { type: "qa", question: "Was macht ein Schneemann im Sommer?", answer: "Er chillt nicht lange." },
-      { type: "qa", question: "Wie nennt man einen Kran mit Humor?", answer: "Hebe-Laune." },
-      { type: "qa", question: "Was macht ein Schuh in der Bibliothek?", answer: "Er tritt leise auf." },
-      { type: "qa", question: "Wie nennt man einen gebildeten Drachen?", answer: "Intellektualosaurus." },
-      { type: "qa", question: "Was macht ein Teppich am Meer?", answer: "Er rollt sich aus." },
-      { type: "qa", question: "Wie nennt man einen gestressten Igel?", answer: "Stachelhaft überfordert." },
-      { type: "qa", question: "Was macht ein Koch im Wald?", answer: "Er sucht Pilzential." },
-      { type: "qa", question: "Wie nennt man eine verliebte Glühbirne?", answer: "Herz-erleuchtet." },
-      { type: "qa", question: "Was macht ein Bonbon beim Zahnarzt?", answer: "Es rechnet mit Konsequenzen." },
-      { type: "qa", question: "Wie nennt man einen sehr alten Witz?", answer: "Einen Vater der Dad Jokes." },
-      { type: "qa", question: "Was macht ein Pudding beim Marathon?", answer: "Wackelig durchhalten." },
-      { type: "qa", question: "Wie nennt man einen sehr lauten Keks?", answer: "Krakelplätzchen." },
-      { type: "qa", question: "Was macht ein Schrank bei einer Diskussion?", answer: "Er bleibt verschlossen." },
-      { type: "qa", question: "Wie nennt man einen ordentlichen Piraten?", answer: "Sauberbärtig." },
-      { type: "qa", question: "Was macht eine Gabel am Computer?", answer: "Sie klickt sich durchs Menü." },
-      { type: "qa", question: "Wie nennt man einen eleganten Esel?", answer: "Stilpferd." },
-      { type: "qa", question: "Was macht ein Brief beim Arzt?", answer: "Er wird geöffnet untersucht." },
-      { type: "qa", question: "Wie nennt man einen sehr dünnen Bären?", answer: "Magerbär." },
-      { type: "qa", question: "Was macht ein Toast auf Instagram?", answer: "Er zeigt seine beste Seite." },
-      { type: "qa", question: "Wie nennt man einen überraschenden Fisch?", answer: "Plot-Twistling." },
-      { type: "qa", question: "Was macht ein Ei im Club?", answer: "Es legt einen Beat." },
-      { type: "qa", question: "Wie nennt man einen gutaussehenden Kaktus?", answer: "Spitzenmodell." },
-      { type: "qa", question: "Was macht ein Regenschirm im Sommer?", answer: "Er hängt durch." },
-      { type: "qa", question: "Wie nennt man einen sturen Föhn?", answer: "Heißköpfig." },
-      { type: "qa", question: "Was macht ein Waschbär bei Prüfungsstress?", answer: "Er versucht sauber durchzukommen." },
-      { type: "qa", question: "Wie nennt man einen kleinen DJ?", answer: "Mini-Mix." },
-      { type: "qa", question: "Was macht ein Arzt im Garten?", answer: "Er behandelt Wurzeln." },
-      { type: "qa", question: "Wie nennt man einen gemütlichen Hai?", answer: "Sofahai." },
-      { type: "qa", question: "Was macht ein Kuchen bei schlechtem Wetter?", answer: "Er bleibt bedeckt." },
-      { type: "qa", question: "Wie nennt man einen romantischen USB-Stick?", answer: "Speicher der Gefühle." },
-      { type: "qa", question: "Was macht ein Dinosaurier beim Bäcker?", answer: "Er holt sich ein Saurteigbrot." },
-      { type: "qa", question: "Wie nennt man einen nervösen Apfel?", answer: "Zitronenverwandt aufgeregt." },
-      { type: "qa", question: "Was macht eine Ente auf dem Laptop?", answer: "Sie surft im Quak-Modus." },
-      { type: "qa", question: "Wie nennt man einen traurigen Mond?", answer: "Niedergeschlagen." },
-      { type: "qa", question: "Was macht ein Kabel im Urlaub?", answer: "Es hängt mal ab." },
-      { type: "qa", question: "Wie nennt man einen sehr kleinen Stau?", answer: "Verkehrsmini." },
-      { type: "qa", question: "Was macht ein Keks unter Blättern?", answer: "Er wird zum Herbstgebäck." },
-      { type: "single", text: "Ich bin nicht faul. Ich bin im Energiesparmodus." },
-      { type: "single", text: "Früher war ich unentschlossen. Heute bin ich mir da nicht mehr so sicher." },
-      { type: "single", text: "Ich wollte einen Witz über Zeit machen, aber der kam nicht gut an." },
-      { type: "single", text: "Mein Humor ist so flach, selbst Teppiche schauen herab." },
-      { type: "single", text: "Manche trinken aus dem Brunnen der Weisheit. Ich habe nur damit gegurgelt." },
-      { type: "single", text: "Ich kann nicht alles haben. Wo sollte ich es auch hinstellen?" },
-      { type: "single", text: "Sport ist Mord. Deshalb betreibe ich Selbstschutz." },
-      { type: "single", text: "Ich rede mit mir selbst. Wenigstens höre ich mir zu." },
-      { type: "single", text: "Wer zuletzt lacht, hat den Witz wahrscheinlich zu spät verstanden." },
-      { type: "single", text: "Montage sind wie Mathe. Keiner weiß, warum sie existieren, aber sie stressen." },
-      { type: "single", text: "Ich habe heute schon viel geschafft. Ich bin aufgestanden. Mehrmals fast." },
-      { type: "single", text: "Mein Bett und ich sind perfekt füreinander. Nur mein Wecker will die Beziehung zerstören." },
-      { type: "single", text: "Ich habe kein schlechtes Gedächtnis. Ich speichere nur selektiv." },
-      { type: "single", text: "Erwachsensein besteht zu 80 Prozent daraus, zu überlegen, was man essen soll." },
-      { type: "single", text: "Ich wollte produktiv sein, aber dann war plötzlich wieder später." },
-      { type: "single", text: "Mein Zimmer ist nicht unordentlich. Es ist kreativ angeordnet." },
-      { type: "single", text: "Wenn Plan A nicht klappt, keine Sorge. Das Alphabet hat noch genug Buchstaben." },
-      { type: "single", text: "Ich bin nicht komisch. Ich bin eine Spezialedition." },
-      { type: "single", text: "Man nennt es Chaos. Ich nenne es spontane Innenarchitektur." },
-      { type: "single", text: "Ich bin nicht zu spät. Ich bin nur zeitlich interessant." }
-    ];
+async function getJoke() {
+  const res = await fetch("https://official-joke-api.appspot.com/random_joke");
+  const data = await res.json();
 
-    let count = 0;
-    let lastIndex = -1;
-    let currentJoke = null;
-    let firstJokeShown = false;
+  currentJoke = data;
 
-    const jokeSingle = document.getElementById("jokeSingle");
-    const jokeQuestion = document.getElementById("jokeQuestion");
-    const jokeAnswer = document.getElementById("jokeAnswer");
-    const answerBtn = document.getElementById("answerBtn");
-    const counter = document.getElementById("counter");
+  document.getElementById("question").innerText = data.setup;
+  document.getElementById("answer").innerText = data.punchline;
+  document.getElementById("answer").style.display = "none";
 
-    function newJoke() {
-      let randomIndex;
+  confetti(30);
+}
 
-      do {
-        randomIndex = Math.floor(Math.random() * jokes.length);
-      } while (randomIndex === lastIndex && jokes.length > 1);
+function showAnswer() {
+  document.getElementById("answer").style.display = "block";
+  confetti(20);
+}
 
-      lastIndex = randomIndex;
-      currentJoke = jokes[randomIndex];
+function confetti(amount) {
+  for (let i=0;i<amount;i++){
+    const c=document.createElement("div");
+    c.className="confetti";
+    c.style.left=Math.random()*100+"vw";
+    c.style.background=["red","blue","green","orange"][Math.floor(Math.random()*4)];
+    document.body.appendChild(c);
+    setTimeout(()=>c.remove(),3000);
+  }
+}
+</script>
 
-      jokeAnswer.style.display = "none";
-      jokeAnswer.textContent = "";
-
-      if (currentJoke.type === "qa") {
-        jokeSingle.style.display = "none";
-        jokeQuestion.style.display = "block";
-        jokeQuestion.textContent = currentJoke.question;
-        answerBtn.disabled = false;
-      } else {
-        jokeSingle.style.display = "block";
-        jokeQuestion.style.display = "none";
-        jokeSingle.textContent = currentJoke.text;
-        answerBtn.disabled = true;
-      }
-
-      count++;
-      counter.textContent = count;
-
-      if (!firstJokeShown) {
-        firstJokeShown = true;
-        burstConfetti(70);
-      } else if (count % 10 === 0) {
-        burstConfetti(60);
-      } else if (count % 5 === 0) {
-        burstConfetti(36);
-      }
-    }
-
-    function showAnswer() {
-      if (!currentJoke || currentJoke.type !== "qa") return;
-
-      jokeAnswer.textContent = currentJoke.answer;
-      jokeAnswer.style.display = "block";
-
-      burstConfetti(28);
-
-      const specialAnswers = [
-        "Er drückt die Enter-Taste.",
-        "Weil sie Pi raten.",
-        "Carlos.",
-        "Schicker Gürtel.",
-        "Depresso.",
-        "Ein Champignon war."
-      ];
-
-      if (specialAnswers.includes(currentJoke.answer)) {
-        burstConfetti(18);
-      }
-    }
-
-    function burstConfetti(amount = 30) {
-      const colors = ["#ff4d6d", "#ffd166", "#06d6a0", "#118ab2", "#9b5de5", "#f77f00"];
-
-      for (let i = 0; i < amount; i++) {
-        const confetti = document.createElement("div");
-        confetti.className = "confetti";
-        confetti.style.left = Math.random() * 100 + "vw";
-        confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
-        confetti.style.width = 6 + Math.random() * 8 + "px";
-        confetti.style.height = 10 + Math.random() * 10 + "px";
-        confetti.style.animationDuration = 2.2 + Math.random() * 1.8 + "s";
-        confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
-
-        document.body.appendChild(confetti);
-
-        setTimeout(() => {
-          confetti.remove();
-        }, 4500);
-      }
-    }
-  </script>
 </body>
 </html>
