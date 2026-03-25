@@ -1,99 +1,425 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-<meta charset="UTF-8">
-<title>Dad Joke Generator</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jorn-Witz-Generator</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
 
-<style>
-body {
-  font-family: Arial;
-  background: linear-gradient(135deg,#f6d365,#fda085);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  height:100vh;
-  margin:0;
-}
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      color: #222;
+      overflow-x: hidden;
+    }
 
-.card {
-  background:white;
-  padding:30px;
-  border-radius:20px;
-  text-align:center;
-  max-width:600px;
-}
+    .card {
+      width: 100%;
+      max-width: 760px;
+      background: rgba(255, 255, 255, 0.94);
+      border-radius: 24px;
+      padding: 32px 24px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+      text-align: center;
+      position: relative;
+      z-index: 2;
+    }
 
-button {
-  padding:12px 20px;
-  border:none;
-  border-radius:10px;
-  margin-top:15px;
-  cursor:pointer;
-}
+    .badge {
+      display: inline-block;
+      background: #222;
+      color: white;
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-size: 0.9rem;
+      margin-bottom: 18px;
+    }
 
-.primary { background:black; color:white; }
-.secondary { background:#eee; }
+    h1 {
+      margin: 0 0 10px;
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      line-height: 1.1;
+    }
 
-#answer { display:none; margin-top:10px; }
+    .subtitle {
+      margin: 0 auto 28px;
+      max-width: 560px;
+      color: #555;
+      font-size: 1.05rem;
+      line-height: 1.5;
+    }
 
-.confetti {
-  position:fixed;
-  width:8px;
-  height:12px;
-  top:-20px;
-  animation:fall 3s linear forwards;
-}
+    .joke-box {
+      background: #fff7ef;
+      border: 2px solid #ffd2a8;
+      border-radius: 20px;
+      padding: 28px 20px;
+      min-height: 190px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 24px;
+      gap: 18px;
+    }
 
-@keyframes fall {
-  to { transform:translateY(100vh) rotate(720deg); }
-}
-</style>
+    .joke-main {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      align-items: center;
+    }
+
+    #jokeQuestion,
+    #jokeSingle {
+      font-size: clamp(1.2rem, 3vw, 1.7rem);
+      line-height: 1.5;
+      margin: 0;
+      font-weight: 700;
+    }
+
+    #jokeAnswer {
+      font-size: clamp(1.05rem, 2.5vw, 1.35rem);
+      line-height: 1.5;
+      margin: 0;
+      color: #5c3d1e;
+      background: #ffe8cf;
+      padding: 14px 16px;
+      border-radius: 16px;
+      max-width: 90%;
+      display: none;
+      animation: fadeInUp 0.35s ease;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+
+    button {
+      border: none;
+      border-radius: 14px;
+      padding: 14px 20px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.15s ease, opacity 0.15s ease, background 0.2s ease;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      opacity: 0.95;
+    }
+
+    .primary {
+      background: #222;
+      color: white;
+    }
+
+    .secondary {
+      background: #ffe4c8;
+      color: #222;
+    }
+
+    .secondary:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .footer-info {
+      color: #666;
+      font-size: 0.95rem;
+      margin-top: 8px;
+    }
+
+    .small-note {
+      margin-top: 16px;
+      color: #888;
+      font-size: 0.85rem;
+    }
+
+    .confetti {
+      position: fixed;
+      width: 10px;
+      height: 16px;
+      top: -20px;
+      border-radius: 2px;
+      opacity: 0.95;
+      z-index: 9999;
+      animation: fall linear forwards;
+      pointer-events: none;
+    }
+
+    @keyframes fall {
+      0% {
+        transform: translateY(-20px) rotate(0deg);
+      }
+      100% {
+        transform: translateY(110vh) rotate(720deg);
+      }
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 520px) {
+      .card {
+        padding: 24px 16px;
+      }
+
+      .joke-box {
+        padding: 22px 16px;
+        min-height: 220px;
+      }
+
+      button {
+        width: 100%;
+      }
+
+      .buttons {
+        flex-direction: column;
+      }
+
+      #jokeAnswer {
+        max-width: 100%;
+      }
+    }
+  </style>
 </head>
-
 <body>
+  <div class="card">
+    <div class="badge">🎉 Level 18 erreicht</div>
+    <h1>Der Jorn-Witz-Generator</h1>
+    <p class="subtitle">
+      Zum 18. Geburtstag gibt es keine tiefgründigen Weisheiten,
+      sondern genau das, was die Welt wirklich braucht:
+      schlechte Witze mit maximalem Jorn-Witz-Potenzial.
+    </p>
 
-<div class="card">
-  <h1>🎉 Dad Joke Generator 🎉</h1>
+    <div class="joke-box">
+      <div class="joke-main">
+        <p id="jokeSingle">Drück auf den Button und bereite dich darauf vor dich tot zu lachen</p>
+        <p id="jokeQuestion" style="display: none;"></p>
+        <p id="jokeAnswer"></p>
+      </div>
+      <button id="answerBtn" class="secondary" onclick="showAnswer()" disabled>
+        👀 Antwort zeigen
+      </button>
+    </div>
 
-  <p id="question">Drück den Button 😎</p>
-  <p id="answer"></p>
+    <div class="buttons">
+      <button class="primary" onclick="newJoke()">🎲 Neuer Witz</button>
+    </div>
 
-  <button class="primary" onclick="getJoke()">Neuer Witz</button>
-  <button class="secondary" onclick="showAnswer()">Antwort zeigen</button>
-</div>
+    <div class="footer-info">
+      Bereits gelesen: <span id="counter">0</span> Witze
+    </div>
 
-<script>
-let currentJoke = null;
+    <div class="small-note">
+      Je flacher der Witz, desto besser das Geschenk.
+    </div>
+  </div>
 
-async function getJoke() {
-  const res = await fetch("https://official-joke-api.appspot.com/random_joke");
-  const data = await res.json();
+  <script>
+    const jokes = [
+      { type: "single", text: "Wissenschaftler haben herausgefunden... – Und sind wieder hineingegangen." },
+      { type: "single", text: "Heute war Schrottwichteln im Kindergarten... – Wir sind die neuen Eltern von Kevin." },
+      { type: "qa", question: "Wie nennt man jemanden, der so tut, als würde er etwas werfen?", answer: "Scheinwerfer." },
+      { type: "qa", question: "Was ist grün, schlau und stellt viele Fragen?", answer: "Günther Lauch." },
+      { type: "single", text: "Ich hab einem Hippster ins Bein geschossen – Jetzt hopst´er." },
+      { type: "qa", question: "Wie nennt man einen Bumerang, der nicht zurückkommt?", answer: "Stock." },
+      { type: "qa", question: "Wie heißt die Frau von Herkules?", answer: "Frau Kules." },
+      { type: "single", text: "Sagt die eine Kuh \"Muuuh\", sagt die andere \"Hey, das wollte ich auch gerade sagen.\"" },
+      { type: "single", text: "Seit ich clean bin, sprechen meine Freunde nicht mehr mit mir. Der Toaster und die Lampe auch nicht." },
+      { type: "qa", question: "Warum fliegen Vögel im Winter in Richtung Süden?", answer: "Weil es schneller geht als Laufen." },
+      { type: "single", text: "\"Anton, findest du, dass ich eine schlechte Mutter bin?\" \"Ich heiße Paul.\"" },
+      { type: "single", text: "Lehrerin zu Peter: Tut mir leid, aber ich kann dir in Französisch maximal eine 5- geben. Peter darauf: \"Gracias!\"" },
+      { type: "qa", question: "Wie nennt man einen Hund, der zaubern kann?", answer: "Labrakadabrador." },
+      { type: "single", text: "\"Man, ich verstehe echt nicht, warum meine Pflanzen immer vertrocknen!?\" – Jochen, steht auf dem Schlauch." },
+      { type: "single", text: "Ich wollte eigentlich einen Witz über die Deutsche Bahn machen, aber ich glaube der kommt nicht an." },
+      { type: "qa", question: "Wie nennt man ein helles Mammut?", answer: "Hellmut." },
 
-  currentJoke = data;
+      { type: "qa", question: "Was sagt ein Bauer, der seinen Trecker sucht?", answer: "Wo ist mein Trecker?" },
+      { type: "single", text: "Egal wie leer du im Kopf bist, manche Leute sind Lehrer." },
+      { type: "single", text: "Ein Beamter zum anderen: \"Was haben denn die Leute? Wir machen doch gar nichts.\"" },
+      { type: "qa", question: "Wie nennt man ein Einhorn mit 2 Hörnern?", answer: "Stier." },
+      { type: "qa", question: "Warum summen Bienen?", answer: "Weil sie den Text nicht kennen." },
+      { type: "single", text: "Ich hab gestern meinen Besen verkauft. – I don't kehr." },
+      { type: "qa", question: "Wohin geht ein Reh ohne Haare?", answer: "In die Reha-Klinik." },
+      { type: "qa", question: "Warum sieht man Ameisen nicht in Kirchen?", answer: "Weil sie In-Sekten sind." },
+      { type: "qa", question: "Wie heißt der Bruder von Elvis?", answer: "Zwölvis." },
+      { type: "qa", question: "Wie heißt ein Hund ohne Beine?", answer: "Ist egal, der kommt eh nicht, wenn man ihn ruft." },
+      { type: "single", text: "Wenn man Buchstabensuppe auskotzt, ist das dann gebrochenes Deutsch?" },
+      { type: "qa", question: "Wie heißt ein Spanier ohne Auto?", answer: "Carlos." },
+      { type: "qa", question: "Was sagt das Schwein zum anderen?", answer: "Es ist Wurst, was aus uns wird." },
+      { type: "single", text: "Ich wollte gerade Spiderman anrufen, aber er hatte kein Netz." },
+      { type: "qa", question: "Bei welchem Arzt ist Pinocchio in Behandlung?", answer: "Beim Holz-Nasen-Ohren-Arzt." },
+      { type: "qa", question: "Welche Sprache wird in der Sauna gesprochen?", answer: "Schwitzerdeutsch." },
+      { type: "qa", question: "Was sind die letzten Worte einer Giftschlange?", answer: "Mist, jetzt habe ich mir auf die Zunge gebissen." },
+      { type: "qa", question: "Wie nennt man ein Rudel aggressiver Wölfe?", answer: "Wolfgang." },
 
-  document.getElementById("question").innerText = data.setup;
-  document.getElementById("answer").innerText = data.punchline;
-  document.getElementById("answer").style.display = "none";
+      { type: "single", text: "Kommt ein Skelett zum Arzt, sagt der Arzt: \"Bisschen spät, was?\"" },
+      { type: "qa", question: "Was beginnt mit \"T\" und endet mit \"itten\"?", answer: "Tiefkühlfritten." },
+      { type: "qa", question: "Was bekommt der Kannibale, der zu spät zum Essen kommt?", answer: "Die kalte Schulter." },
+      { type: "qa", question: "Was trinkt ein Mann vor dem Sex?", answer: "Einen Kaffee Latte." },
+      { type: "qa", question: "Was ist klein, grün und dreieckig?", answer: "Das kleine grüne Dreieck." },
+      { type: "single", text: "Fragt der Walfisch den Thunfisch: \"Was soll ich tun, Fisch?\" Sagt der Thunfisch zum Walfisch: \"Du hast die Wahl Fisch!\"" },
+      { type: "qa", question: "Was sagt die Null zur Acht?", answer: "Schicker Gürtel." },
+      { type: "qa", question: "Was macht die Knackwurst so knackig?", answer: "Das N." },
+      { type: "qa", question: "Was sitzt auf dem Ast und weint?", answer: "Eine Heule." },
+      { type: "qa", question: "Warum findet der Henker nie den Rückweg?", answer: "Weil er nur die Hinrichtung kennt." },
+      { type: "qa", question: "Wie heißt der Bruder vom Werwolf?", answer: "Warumwolf." },
+      { type: "single", text: "\"Oma, hast du meine Tabletten gesehen? Da steht LSD drauf.\" \"Vergiss mal die Tabletten, hast du den Drachen in der Küche gesehen?\"" },
+      { type: "qa", question: "Was ist die Hälfte von Sechs?", answer: "Halb Sechs." },
+      { type: "single", text: "\"Wie lange habe ich noch zu leben, Doktor?\" \"10!\" \"10? 10 was? Monate? Jahre?\" \"9, 8, 7...\"" },
+      { type: "single", text: "Ich hab meinem Freund gerade einen Limonadenwitz erzählt. Fanta lustig." },
+      { type: "qa", question: "Was ist der Unterschied zwischen Lidl und Schule?", answer: "Lidl lohnt sich." },
+      { type: "qa", question: "Wer wohnt im Dschungel und schummelt immer?", answer: "Mogli." },
+      { type: "qa", question: "Was ist weiß und stört beim Essen?", answer: "Eine Lawine." },
 
-  confetti(30);
-}
+      { type: "qa", question: "Wo sind Elefanten heimisch?", answer: "In Rüsselsheim." },
+      { type: "qa", question: "Warum klaut Robin Hood Deodorants?", answer: "Weil er es unter den Armen verteilt." },
+      { type: "qa", question: "Wie lautet der Vorname vom Reh?", answer: "Kartoffelpü." },
+      { type: "qa", question: "Was sagt der große Stift zum kleinen Stift?", answer: "Wachs mal Stift." },
+      { type: "single", text: "Ich habe den Joghurt fallen gelassen. Er war nicht mehr haltbar." },
+      { type: "single", text: "\"Und was ist so dein Lieblingsfilm?\" \"Tesafilm ist ein echt guter Streifen.\"" },
+      { type: "qa", question: "Wisst ihr was der Hammer ist?", answer: "Ein Werkzeug." },
+      { type: "qa", question: "Warum hat die Polizei den Dieb nicht verhaftet?", answer: "Er hatte eine Anti-Haft-Beschichtung." },
+      { type: "qa", question: "Wie nennt man einen Deutschen im All?", answer: "Alman." },
+      { type: "qa", question: "Was atmen Lockführer?", answer: "Zugluft." },
+      { type: "qa", question: "Welcher Vogel vögelt gerne?", answer: "Der Fuckuck." },
+      { type: "qa", question: "Wie heißt ein Ritter ohne Helm?", answer: "Willhelm." },
+      { type: "qa", question: "Wie war die Stimmung in der DDR?", answer: "Sie hielt sich in Grenzen." },
+      { type: "qa", question: "Wie heißt ein Bär, der fliegen kann?", answer: "Hubschraubär." },
+      { type: "single", text: "Treffen sich zwei Ziegen, fragt die eine: \"Kommst du heute Abend mit in den Club?\" Sagt die andere: \"Nein, hab keinen Bock.\"" },
+      { type: "qa", question: "Welche Schuhe kauft jemand, der zwei linke Füße hat?", answer: "Flipflips." },
+      { type: "single", text: "Wie nennt man Sex mit Gegenständen? Dingsbums." },
 
-function showAnswer() {
-  document.getElementById("answer").style.display = "block";
-  confetti(20);
-}
+      { type: "qa", question: "Wann gehen U-Boote unter?", answer: "Am Tag der offenen Tür." },
+      { type: "qa", question: "Magst du Chemie-Witze?", answer: "Chlor!" },
+      { type: "qa", question: "Was macht ein arbeitsloser Schauspieler?", answer: "Spielt keine Rolle." },
+      { type: "qa", question: "Wie nennt man ein Überraschungsessen?", answer: "Topf Secret." },
+      { type: "single", text: "Treffen sich zwei Unsichtbare, sagt der eine: \"Dich habe ich ja schon lange nicht mehr gesehen!\"" },
+      { type: "qa", question: "Was passiert, wenn man nachts in der Bäckerei anruft?", answer: "Die Mehlbox geht dran." },
+      { type: "qa", question: "Wie nennt man einen unentschlossenen japanischen Krieger?", answer: "Nunja." },
+      { type: "qa", question: "Wie heißt die Auszeichnung für besonders, brave, ruhige Hunde?", answer: "No-Bell-Preis." },
+      { type: "qa", question: "Was sitzt auf einem Baum und winkt?", answer: "Ein Huhu." },
+      { type: "qa", question: "Was schwimmt auf dem Wasser und fängt mit Z an?", answer: "Zwei Enten." },
+      { type: "single", text: "Der Prinz ist angepisst – Rapunzel ließ ihren Harn herunter." },
+      { type: "single", text: "In Australien schaut ein Pinguin total verschwitzt aus dem Beutel eines Kängurus und sagt: \"Scheiß Schüleraustausch.\"" },
+      { type: "single", text: "Sagt ein Gast zur Kellnerin: \"Hätten Sie noch Milch zum Kaffee?\" Sagt die Kellnerin: \"Ich hab Fettarme.\" Antwortet der Gast: \"Das seh ich. Aber mit denen können Sie mir doch Milch bringen.\"" },
+      { type: "single", text: "Hat mich eine Prostituierte am Bahnhof angesprochen. Sie meinte für 30 Euro macht sie alles, was ich will. Jetzt rate mal, wer heute Abend bei mir das Laminat verlegt." },
+      { type: "single", text: "Geht eine schwangere Frau in eine Bäckerei und sagt: \"Ich bekomme ein Brot.\" Sagt der Bäcker: \"Sachen gibt's.\"" },
 
-function confetti(amount) {
-  for (let i=0;i<amount;i++){
-    const c=document.createElement("div");
-    c.className="confetti";
-    c.style.left=Math.random()*100+"vw";
-    c.style.background=["red","blue","green","orange"][Math.floor(Math.random()*4)];
-    document.body.appendChild(c);
-    setTimeout(()=>c.remove(),3000);
-  }
-}
-</script>
+      { type: "single", text: "Was sagt ein Haifisch, wenn er einen Surfer sieht? \"Das ist aber nett. Serviert auf Frühstücksbrettchen.\"" },
+      { type: "single", text: "Was ist ein Keks unter einem Baum? Ein schattiges Plätzchen!" },
+      { type: "single", text: "Was macht eine Bombe im Bordell? Puff!" },
+      { type: "single", text: "Hab mich vorhin ausgesperrt. War ganz aus dem Häuschen." },
+      { type: "single", text: "Mein Hund kennt alle Straßen in- und auswendig. Ich nenne ihn Google Mops." },
+      { type: "single", text: "Ich habe mit der Pflanze ausgemacht, sie nur noch einmal im Monat zu gießen. Sie ist darauf eingegangen." },
+      { type: "single", text: "Was macht ein Clown im Büro? Faxen." }
+    ];
 
+    let count = 0;
+    let lastIndex = -1;
+    let currentJoke = null;
+    let firstJokeShown = false;
+
+    const jokeSingle = document.getElementById("jokeSingle");
+    const jokeQuestion = document.getElementById("jokeQuestion");
+    const jokeAnswer = document.getElementById("jokeAnswer");
+    const answerBtn = document.getElementById("answerBtn");
+    const counter = document.getElementById("counter");
+
+    function newJoke() {
+      let randomIndex;
+
+      do {
+        randomIndex = Math.floor(Math.random() * jokes.length);
+      } while (randomIndex === lastIndex && jokes.length > 1);
+
+      lastIndex = randomIndex;
+      currentJoke = jokes[randomIndex];
+
+      jokeAnswer.style.display = "none";
+      jokeAnswer.textContent = "";
+
+      if (currentJoke.type === "qa") {
+        jokeSingle.style.display = "none";
+        jokeQuestion.style.display = "block";
+        jokeQuestion.textContent = currentJoke.question;
+        answerBtn.disabled = false;
+      } else {
+        jokeSingle.style.display = "block";
+        jokeQuestion.style.display = "none";
+        jokeSingle.textContent = currentJoke.text;
+        answerBtn.disabled = true;
+      }
+
+      count++;
+      counter.textContent = count;
+
+      if (!firstJokeShown) {
+        firstJokeShown = true;
+        burstConfetti(70);
+      } else if (count % 10 === 0) {
+        burstConfetti(55);
+      } else if (count % 5 === 0) {
+        burstConfetti(30);
+      }
+    }
+
+    function showAnswer() {
+      if (!currentJoke || currentJoke.type !== "qa") return;
+
+      jokeAnswer.textContent = currentJoke.answer;
+      jokeAnswer.style.display = "block";
+
+      burstConfetti(24);
+    }
+
+    function burstConfetti(amount = 30) {
+      const colors = ["#ff4d6d", "#ffd166", "#06d6a0", "#118ab2", "#9b5de5", "#f77f00"];
+
+      for (let i = 0; i < amount; i++) {
+        const confetti = document.createElement("div");
+        confetti.className = "confetti";
+        confetti.style.left = Math.random() * 100 + "vw";
+        confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+        confetti.style.width = 6 + Math.random() * 8 + "px";
+        confetti.style.height = 10 + Math.random() * 10 + "px";
+        confetti.style.animationDuration = 2.2 + Math.random() * 1.8 + "s";
+        confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+
+        document.body.appendChild(confetti);
+
+        setTimeout(() => {
+          confetti.remove();
+        }, 4500);
+      }
+    }
+  </script>
 </body>
 </html>
